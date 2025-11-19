@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo Listesi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Todo Listesi</h1>
+        <div>
+            <span class="me-3">👤 <b th:text="${username}"></b></span>
+            <a href="/logout" class="btn btn-outline-secondary btn-sm">Çıkış Yap</a>
+        </div>
+    </div>
+    <form th:action="@{/todos}" method="post" class="row g-2 mb-4">
+        <div class="col-auto">
+            <input type="text" name="title" class="form-control" placeholder="Yeni görev" required />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Ekle</button>
+        </div>
+    </form>
+    <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center" th:each="todo : ${todos}">
+            <div class="d-flex align-items-center">
+                <form th:action="@{'/todos/toggle/' + ${todo.id}}" method="post" class="me-2">
+                    <input type="checkbox" name="completed" th:checked="${todo.completed}" onchange="this.form.submit()">
+                </form>
+                <span th:text="${todo.title}" th:classappend="${todo.completed} ? 'text-decoration-line-through text-muted' : ''"></span>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-warning me-2" data-bs-toggle="modal" th:attr="data-bs-target='#editModal'" th:attrappend="data-id=${todo.id},data-title=${todo.title}">Düzenle</button>
+                <form th:action="@{'/todos/delete/' + ${todo.id}}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-danger">Sil</button>
+                </form>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form th:action="@{/todos/edit}" method="post">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Görev Düzenle</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="id" id="edit-id">
+          <div class="mb-3">
+            <label for="edit-title" class="form-label">Başlık</label>
+            <input type="text" class="form-control" id="edit-title" name="title" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+          <button type="submit" class="btn btn-success">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Modal açılırken ilgili todo'nun bilgilerini doldur
+const editModal = document.getElementById('editModal');
+if (editModal) {
+  editModal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const id = button.getAttribute('data-id');
+    const title = button.getAttribute('data-title');
+    document.getElementById('edit-id').value = id;
+    document.getElementById('edit-title').value = title;
+  });
+}
+</script>
+</body>
+</html>
