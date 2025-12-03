@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class AuthController {
+    //burası eklenen kısım
     private final UserRepository userRepository;
 
     public AuthController(UserRepository userRepository) {
